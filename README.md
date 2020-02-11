@@ -1,2 +1,2 @@
 # dgnfr-guard-bypass
-A tiny program to bypass dgnfr's garbage anti cheat 
+Credit to NewWinter from Guided Hacking for his AOB pattern scan code.
