@@ -132,12 +132,11 @@ int main() {
 	char pattern2[] = "\x55\x8B\xEC\x83\xEC\x0C\x56\x57\xFF\x75\x08\x8D\xB9\xD0\x04\x00";
 	char mask2[] = "xxxxxxxxxxxxxxx?";
 
-	char pattern3[] = "\xE9\x7D\xFE\xFF\xFF\xCC\xCC\xCC\xCC";
-	char mask3[] = "xxxxxxxxx";
+	char pattern3[] = "\x55\x8B\xEC\x6A\xFF\x68\x0D\x9F";
+	char mask3[] = "xxxxxxxx";
 
 	byte patch1[] = { 0x90, 0x90, 0x90, 0x90, 0x90 };
 	byte patch2 = 0xC3;
-	byte patch3[] = { 0xEB, 0xFE, 0x90, 0x90, 0x90 };
 
 	DWORD pID = GetPID(process);																	// Obtain the process ID of the above process
 	if (!pID) {																						// If we can't get a valid process ID
@@ -156,15 +155,17 @@ int main() {
 
 	std::cout << "Looking for integrity checks..." << std::endl;
 
-	DWORD address = ExternalAoBScan(pHandle, pID, process, pattern, mask);							// Run the AoB scan and store the returned address in the address varaible
-	DWORD address2 = ExternalAoBScan(pHandle, pID, process, pattern2, mask2);						// 2nd patch
-	DWORD address3 = ExternalAoBScan(pHandle, pID, process, pattern3, mask3);						// 3rd patch
+	DWORD address = ExternalAoBScan(pHandle, pID, process, pattern, mask);							// Run the AoB scan and store the returned address in the address variable
+	DWORD address2 = ExternalAoBScan(pHandle, pID, process, pattern2, mask2);						// 2nd address
+	DWORD address3 = ExternalAoBScan(pHandle, pID, process, pattern3, mask3);						// 3rd address
 
-	if (address) {																					// If scan succeed
+	//std::cout << std::hex << address << std::endl << address2 << std::endl << address3 << std::endl;	//checks returned addresses
+
+	if (address && address2 && address3) {																					// If scan succeed
 		std::cout << "Integrity checks found" << std::endl;		
 		WriteProcessMemory(handleuh, (LPVOID)address, &patch1, sizeof(patch1), 0);
 		WriteProcessMemory(handleuh, (LPVOID)address2, &patch2, sizeof(patch2), 0);
-		WriteProcessMemory(handleuh, (LPVOID)address3, &patch3, sizeof(patch3), 0);
+		WriteProcessMemory(handleuh, (LPVOID)address3, &patch2, sizeof(patch2), 0);
 		std::cout << "dgnfrguard successfully bypassed! :)";
 	}
 	else {
