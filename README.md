@@ -1,6 +1,6 @@
 # DGNFR Guard Bypass
 
-List of strings detected by dgnfrguard:
+List of strings detected by dgnfrguard:  
 !xSpeed 6.0  
 !xSpeed.net 2  
 !xSpeed.net 3  
