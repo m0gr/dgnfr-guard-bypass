@@ -126,16 +126,17 @@ DWORD ExternalAoBScan(HANDLE pHandle, DWORD pID, char* mod, char* pattern, char*
 
 int main() {
 	char process[] = "dragonsaga.exe";																// The name of the process (and module) we need to access
-	char pattern[] = "\xE8\x7B\x09\x00\x00\x6A\x00\x68\xE8\x03\x00\x00\x56\x53";					// The pattern we are looking for
-	char mask[] = "xxx??x?xxx??xx";																	// The mask we are using for that pattern
+
+	char pattern[] = "\x0F\x84\x07\x00\x00\x00\xF3\x90\xE9\xEB\xFF\xFF\xFF\xFF\x34\x24\x8B\x0C\x24\x83\xC4\x04\x50";		// The pattern we are looking for
+	char mask[] = "xxx???xxxxxxxxxxxxxxxxx";																				// The mask we are using for that pattern
 
 	char pattern2[] = "\x55\x8B\xEC\x83\xEC\x0C\x56\x57\xFF\x75\x08\x8D\xB9\xD0\x04\x00";
 	char mask2[] = "xxxxxxxxxxxxxxx?";
 
-	char pattern3[] = "\x55\x8B\xEC\x6A\xFF\x68\x0D\x9F";
+	char pattern3[] = "\x55\x8B\xEC\x6A\xFF\x68\xAD\x97";
 	char mask3[] = "xxxxxxxx";
 
-	byte patch1[] = { 0x90, 0x90, 0x90, 0x90, 0x90 };
+	byte patch1[] = { 0xEB, 0x06, 0x90, 0x90, 0x90, 0x90 };
 	byte patch2 = 0xC3;
 
 	DWORD pID = GetPID(process);																	// Obtain the process ID of the above process
@@ -153,7 +154,7 @@ int main() {
 		return 1;
 	}
 
-	std::cout << "Looking for integrity checks..." << std::endl;
+	std::cout << "Looking for patterns to patch..." << std::endl;
 
 	DWORD address = ExternalAoBScan(pHandle, pID, process, pattern, mask);							// Run the AoB scan and store the returned address in the address variable
 	DWORD address2 = ExternalAoBScan(pHandle, pID, process, pattern2, mask2);						// 2nd address
@@ -161,15 +162,15 @@ int main() {
 
 	//std::cout << std::hex << address << std::endl << address2 << std::endl << address3 << std::endl;	//checks returned addresses
 
-	if (address && address2 && address3) {																					// If scan succeed
-		std::cout << "Integrity checks found" << std::endl;		
+	if (address2 && address3) {																					// If scan succeed
+		std::cout << "Patterns found" << std::endl;		
 		WriteProcessMemory(handleuh, (LPVOID)address, &patch1, sizeof(patch1), 0);
 		WriteProcessMemory(handleuh, (LPVOID)address2, &patch2, sizeof(patch2), 0);
 		WriteProcessMemory(handleuh, (LPVOID)address3, &patch2, sizeof(patch2), 0);
 		std::cout << "dgnfrguard successfully bypassed! :)";
 	}
 	else {
-		std::cout << "Couldn't find integrity checks :(" << std::endl;
+		std::cout << "Couldn't find patterns :(" << std::endl;
 	}
 	Sleep(3000);
 	exit(0);
